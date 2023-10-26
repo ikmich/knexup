@@ -1,0 +1,5 @@
+#! /bin/bash
+
+npm uninstall -g knexup
+npm run build
+npm install -g

@@ -12,14 +12,12 @@ export interface TableInit {
 export type MigrationInitMap = { [k: string]: TableInit };
 
 export type KnexupConfig = {
-  knexupDir: string;
+  knexupDir?: string;
 };
 
 export type CliOptions = {
   table?: string;
   path?: string;
-  typescript: boolean;
-  javascript: boolean;
 };
 
 export type KnexupInitOpts = {

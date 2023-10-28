@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs, { WriteFileOptions } from 'fs-extra';
 import Path from 'path';
 
 export type FileCopyOpts = {
@@ -19,8 +19,8 @@ export const file_ = {
     return fs.readFileSync(filepath, { encoding: 'utf-8' });
   },
 
-  writeFile(filePath: string, data: string) {
-    fs.writeFileSync(filePath, data);
+  writeFile(filePath: string, data: string, options?: WriteFileOptions) {
+    fs.writeFileSync(filePath, data, options);
   },
 
   joinPaths(...paths: string[]): string {

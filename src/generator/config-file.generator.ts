@@ -14,7 +14,8 @@ export function configFileGenerator(destDir: string) {
   const configFile = Path.join(destDir, CONFIG_FILENAME);
   if (!fs.existsSync(configFile)) {
     fs.writeFileSync(configFile, contents);
+    console.log(chalk.blueBright(`-> ${CONFIG_FILENAME} created in this location.`));
   } else {
-    console.log(chalk.yellow('knexup config file already exists'));
+    // console.log(chalk.yellow('knexup config file already exists'));
   }
 }

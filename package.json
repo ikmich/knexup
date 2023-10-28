@@ -9,13 +9,12 @@
     "knexup-cli": "dist/bin/index.js"
   },
   "scripts": {
-    "clean": "rimraf ./dist && rm knexup-config.js",
+    "clean": "rimraf ./dist && rm knexup-config.js && rimraf ./src/db",
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "demo-init": "npm run build && ts-node dist/bin/index.js -t user_session",
-    "demo-bootstrap": "npm run build && ts-node dist/bin/index.js bootstrap",
-    "demo-project": "npm run build && ts-node dist/bin/index.js create-project --path='/Users/i.agbasimalo/projects/code/knexup-projects'"
+    "demo-init": "npm run build && ts-node dist/bin/index.js -t user",
+    "demo-project": "npm run build && ts-node dist/bin/index.js project --path='/Users/i.agbasimalo/projects/code/knexup-projects'"
   },
   "keywords": [
     "knex",

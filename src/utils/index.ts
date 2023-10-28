@@ -14,29 +14,33 @@ export function _undefined(val: any): boolean {
   return typeof val == 'undefined';
 }
 
-export function _removeLeadingSlash(s: string): string {
-  return s.replace(/^\/+/, '');
+export const path_ = {
+  removeLeadingSlash(s: string): string {
+    return s.replace(/^\/+/, '');
+  }
 }
 
-export function _isValidTable(table: string): boolean {
-  if (!table) return false;
+export const table_ = {
+  isValidTable(table: string): boolean {
+    if (!table) return false;
 
-  const regexes = {
-    letterUnderscore: /[a-zA-Z_]/i,
-    letterUnderscoreNumber: /[a-zA-Z0-9_]/i
-  };
+    const regexes = {
+      letterUnderscore: /[a-zA-Z_]/i,
+      letterUnderscoreNumber: /[a-zA-Z0-9_]/i
+    };
 
-  // First char must be a letter or underscore
-  if (!regexes.letterUnderscore.test(table.charAt(0))) {
-    return false;
-  }
-
-  // Check other characters
-  for (let i = 0; i < table.length; i++) {
-    if (!regexes.letterUnderscoreNumber.test(table.charAt(i))) {
+    // First char must be a letter or underscore
+    if (!regexes.letterUnderscore.test(table.charAt(0))) {
       return false;
     }
-  }
 
-  return true;
-}
+    // Check other characters
+    for (let i = 0; i < table.length; i++) {
+      if (!regexes.letterUnderscoreNumber.test(table.charAt(i))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+};

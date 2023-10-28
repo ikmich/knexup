@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import { columnUtils, dbUtils, ext, tableBuilderUtils, tableUtils } from './utils/knex-utils.js';
-import { MigrationInitMap, TableRefs } from './types.js';
+import { MigrationInitMap, TableInit, TableRefs } from './types.js';
 import { multiTableInitGenerator } from './generator/multi-table-init.generator.js';
 
 export const knexUtil = {
@@ -57,4 +57,9 @@ export const knexup = {
   run: async () => {
 
   }
+};
+
+export {
+  TableRefs,
+  TableInit
 };

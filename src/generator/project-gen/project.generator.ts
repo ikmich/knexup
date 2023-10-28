@@ -3,7 +3,9 @@ import Path from 'path';
 import { knexfileGenerator } from './knexfile.generator.js';
 import { shell_ } from '../../utils/shell-util.js';
 import { configFileGenerator } from '../config-file.generator.js';
-import { GIT_IGNORE_CONTENTS, PRETTIERRC_CONTENTS } from '../../constants.js';
+import { GIT_IGNORE_CONTENTS, KNEXUP_DIR, KNEXUP_FILENAME, PRETTIERRC_CONTENTS } from '../../constants.js';
+import { tableRefsFileGenerator } from '../table-refs-file.generator.js';
+import { knexupFileGenerator } from '../knexup-file.generator.js';
 
 /* dependencies: knex objection mysql2? pg?
 $ npm install --package-lock-only knex objection
@@ -33,12 +35,13 @@ export async function projectGenerator(projectRoot: string, projectName: string)
   // tsc init
   await shell_.exec(`cd ${projectRoot} && npx tsc --init`);
 
-  // Generate folders
+  // [Generate folders]
 
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
 
-  const dbDir = Path.join(srcDir, 'db/');
+  // const dbDir = Path.join(srcDir, 'db/');
+  const dbDir = Path.resolve(KNEXUP_DIR);
   file_.ensureDirPath(dbDir);
 
   const knexDir = dbDir;
@@ -51,7 +54,7 @@ export async function projectGenerator(projectRoot: string, projectName: string)
   const knexupInitDir = Path.join(knexDir, 'init/');
   file_.ensureDirPath(knexupInitDir);
 
-  // Generate files
+  // [Generate files]
   configFileGenerator(projectRoot);
 
   const gitignoreFile = Path.join(projectRoot, '.gitignore');
@@ -72,5 +75,8 @@ export async function projectGenerator(projectRoot: string, projectName: string)
 
   const knexConfigFilePath = Path.join(srcDir, 'knex.config.ts');
   file_.writeFile(knexConfigFilePath, '');
+
+  // await tableRefsFileGenerator(knexDir);
+  await knexupFileGenerator(knexDir);
 
 }

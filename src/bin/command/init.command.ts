@@ -1,11 +1,75 @@
 import { Command } from 'commander';
-import { singleTableInitFileGenerator } from '../../generator/single-table-init-file.generator.js';
-import { _fn, _isValidTable, _undefined } from '../../utils/index.js';
+import { tableInitFileGenerator } from '../../generator/table-init-file.generator.js';
+import { _fn, _undefined, path_, table_ } from '../../utils/index.js';
 import Path from 'path';
 import fs from 'fs-extra';
 import { CliOptions } from '../../types.js';
-import { CONFIG_FILENAME, KNEXUP_INIT_DIR, PROJECT_ROOT } from '../../constants.js';
+import { CONFIG_FILENAME, KNEXUP_DIR, KNEXUP_INIT_DIR, PROJECT_ROOT } from '../../constants.js';
 import { configUtil } from '../../utils/config-util.js';
+import { configFileGenerator } from '../../generator/config-file.generator.js';
+import { knexupUtil } from '../../utils/knexup-util.js';
+import { file_ } from '../../utils/file-util.js';
+import { tableRefsFileGenerator } from '../../generator/table-refs-file.generator.js';
+import chalk from 'chalk';
+import { knexupFileGenerator } from '../../generator/knexup-file.generator.js';
+
+async function createKnexupFile() {
+  // create knexup dir
+  const knexupDir = await knexupUtil.getKnexupDir();
+  file_.ensureDirPath(Path.join(PROJECT_ROOT, knexupDir));
+  await knexupFileGenerator(knexupDir);
+}
+
+async function createTableRefsFile() {
+  // create knexup dir
+  const knexupDir = await knexupUtil.getKnexupDir();
+  file_.ensureDirPath(Path.join(PROJECT_ROOT, knexupDir));
+  await tableRefsFileGenerator(knexupDir);
+}
+
+export async function processInitCommand2(command: Command) {
+  const opts = command.opts<CliOptions>();
+  const args = command.args;
+  const arg0 = args[0]?.trim() || null;
+  const arg1 = args[1]?.trim() || null;
+
+  const params = {
+    table: null as string | null
+  };
+
+  configFileGenerator(PROJECT_ROOT);
+  await createTableRefsFile();
+  await createKnexupFile();
+
+  if (opts.table?.trim()) {
+    params.table = opts.table?.trim();
+  }
+
+  console.log('processInitCommand2', {
+    args,
+    opts,
+    state: params,
+    commandTag: arg0,
+    arg1
+  });
+
+  if (params.table) {
+    /* Validate table name. */
+    if (!table_.isValidTable(params.table)) {
+      console.error(chalk.red('!ERROR! Invalid table name'));
+      return;
+    }
+
+    const destDir = await knexupUtil.getInitDir();
+    file_.ensureDirPath(destDir);
+
+    tableInitFileGenerator(params.table, destDir);
+
+    return;
+  }
+
+  console.log(chalk.yellow('no-op'));
+}
 
 export async function processInitCommand(command: Command) {
   const opts = command.opts<CliOptions>();
@@ -31,7 +95,7 @@ export async function processInitCommand(command: Command) {
     _table = opts.table;
   }
 
-  console.log({
+  console.log('[processInitCommand]', {
     opts,
     args,
     _table
@@ -43,7 +107,7 @@ export async function processInitCommand(command: Command) {
   }
 
   /* Strip invalid characters from table name. */
-  if (!_isValidTable(_table)) {
+  if (!table_.isValidTable(_table)) {
     throw '! Invalid table name';
   }
 
@@ -59,12 +123,12 @@ export async function processInitCommand(command: Command) {
       // const config = require(configFile) as KnexupConfig;
       const config = await configUtil.readConfig();
       if (_undefined(config?.knexupDir)) {
-        return config?.knexupDir.replace(/^\//, '');
+        return config?.knexupDir?.replace(/^\//, '');
       }
     }
 
     return KNEXUP_INIT_DIR;
   });
 
-  singleTableInitFileGenerator(_table, pathValue);
+  tableInitFileGenerator(_table, pathValue);
 }

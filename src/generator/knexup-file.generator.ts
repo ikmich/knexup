@@ -20,5 +20,5 @@ export async function knexupFileGenerator(targetDirPath: string) {
   // write contents to file
   file_.writeFile(file, contents, { encoding: 'utf-8' });
   // fs.writeFileSync(file, contents, { encoding: 'utf-8', mode: 0o766 });
-  console.log(chalk.blueBright(`-> ${filename} created in ${targetDirPath}`));
+  console.log(chalk.blueBright(`${filename} created in ${targetDirPath}`));
 }

@@ -13,6 +13,7 @@ program
   .description('knexup.js cli')
   .option('-p, --path <char>', 'Path relative to project root.')
   .option('-t, --table <char>', 'Database table name.')
+  .option('-d, --database-client <char>', 'The preferred database client (mysql|postgres|sqlite)')
 ;
 
 program
@@ -26,17 +27,9 @@ program
   .command(COMMAND_PROJECT)
   .description('Generate a knex.js project')
   .action(async () => {
-    // console.log('-> project')
     await processCreateProjectCommand(program);
   });
 
-
-// program
-//   .command(COMMAND_BOOTSTRAP)
-//   .description('Bootstrap knexup for the project. Generates knexup config and init files.')
-//   .action(async () => {
-//     await processBootstrapCommand(program);
-//   });
 
 
 program.parse();

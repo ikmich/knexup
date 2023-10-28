@@ -18,6 +18,7 @@ export type KnexupConfig = {
 export type CliOptions = {
   table?: string;
   path?: string;
+  databaseClient?: string;
 };
 
 export type KnexupInitOpts = {

@@ -3,19 +3,16 @@ import Path from 'path';
 import { knexfileGenerator } from './knexfile.generator.js';
 import { shell_ } from '../../utils/shell-util.js';
 import { configFileGenerator } from '../config-file.generator.js';
-import {
-  GIT_IGNORE_CONTENTS,
-  KNEXUP_DIR, KNEXUP_DIR_NAME,
-  KNEXUP_FILENAME,
-  KNEXUP_INIT_DIR, KNEXUP_INIT_DIR_NAME,
-  PRETTIERRC_CONTENTS, PROJECT_ROOT
-} from '../../constants.js';
+import { GIT_IGNORE_CONTENTS, KNEXUP_DIR_NAME, KNEXUP_INIT_DIR_NAME, PRETTIERRC_CONTENTS } from '../../constants.js';
 import { tableRefsFileGenerator } from '../table-refs-file.generator.js';
 import { knexupFileGenerator } from '../knexup-file.generator.js';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { tsconfigSourceContent } from './contents/tsconfig-source.content.js';
+import { dbKnexSetupFileGenerator } from './db-knex-setup-file.generator.js';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
@@ -24,16 +21,20 @@ $ npm install --package-lock-only knex objection
 $ npm install --package-lock-only --save-dev typescript prettier @types/node
 * */
 
-const dependencies = ['knex', 'objection', 'dotenv', 'change-case'].join(' ');
-const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'sqlite3'].join(' ');
+const dependencies = ['knex', 'objection', 'dotenv', 'change-case'];
+const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'slugify', 'rimraf'];
 
-export async function projectGenerator(projectRoot: string, projectName: string) {
+export async function newProjectGenerator(projectRoot: string, projectName: string, dbClient: string) {
 
   // console.log('[projectGenerator]', {
   //   projectRoot,
   //   // dependencies,
   //   // devDependencies
   // });
+
+  if (dbClient) {
+    dependencies.push(dbClient);
+  }
 
   file_.ensureDirPath(projectRoot);
 
@@ -49,8 +50,8 @@ export async function projectGenerator(projectRoot: string, projectName: string)
 
   console.log('Setting up dependencies...');
   // setup package.json
-  await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only ${dependencies}`);
-  await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only --save-dev ${devDependencies}`);
+  await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only ${dependencies.join(' ')}`);
+  await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only --save-dev ${devDependencies.join(' ')}`);
 
   console.log('Generating files...');
   // [Generate folders]
@@ -86,13 +87,22 @@ export async function projectGenerator(projectRoot: string, projectName: string)
   const srcIndexFile = Path.join(srcDir, 'index.ts');
   file_.writeFile(srcIndexFile, `console.log('${projectName}');`);
 
+  console.log('Generating knexfile...');
   const knexfilePath = Path.join(knexDir, 'knexfile.ts');
-  file_.writeFile(knexfilePath, '');
-  knexfileGenerator(knexfilePath, projectName, projectRoot);
+  // file_.writeFile(knexfilePath, '');
+  knexfileGenerator({
+    knexfilePath,
+    projectName,
+    projectRoot,
+    dbClient
+  });
 
-  const knexConfigFilePath = Path.join(dbDir, 'knexconfig.ts');
-  file_.writeFile(knexConfigFilePath, '');
+  console.log('Setting db.knex configuration...');
+  const dbKnexFilePath = Path.join(dbDir, 'db.knex.ts');
+  dbKnexSetupFileGenerator(dbKnexFilePath);
+  // file_.writeFile(dbKnexFilePath, '');
 
+  console.log('Generating knexup files...');
   await tableRefsFileGenerator(knexupDir);
   await knexupFileGenerator(knexupDir);
 
@@ -100,38 +110,26 @@ export async function projectGenerator(projectRoot: string, projectName: string)
 }
 
 function updateTsconfigJsonFile(projectRoot: string) {
-
   const tsconfigFile = Path.join(projectRoot, 'tsconfig.json');
   fs.writeFileSync(tsconfigFile, tsconfigSourceContent);
-
-  // const regexes = {
-  //   blockComments: /\/\*.*\*\//g,
-  //   lineComments: /\s*\/\/.*\n/g
-  // }
-  // let stripped = tsConfig
-  //   .replace(regexes.blockComments, '')
-  //   .replace(regexes.lineComments, '');
-  //
-  // console.log(stripped)
-
-  // const tsConfig = await import(Path.join(projectRoot, 'tsconfig.json'), {
-  //   assert: { type: 'json' }
-  // });
-  //assert { type: 'json' }
-
-  // console.log({ tsConfig });
 }
 
 async function updatePackageJsonFile(projectRoot: string) {
   let packageJsonFile = Path.join(projectRoot, 'package.json');
-
-  const config: any = (await import(packageJsonFile, {
-    assert: { type: 'json' }
-  }))?.default;
+  const config: any = require(packageJsonFile);
+  // const config: any = (await import(packageJsonFile, {
+  //   assert: { type: 'json' }
+  // }))?.default;
 
   if (config) {
-    // console.log({ config });
+    // "type"
     config['type'] = 'module';
+
+    // "engines"
+    config['engines'] = {
+      node: '>=16'
+    };
+
     const configJson = JSON.stringify(config, null, 2);
     fs.writeFileSync(packageJsonFile, configJson);
   }

@@ -1,8 +1,20 @@
 import { file_ } from '../../utils/file-util.js';
+import chalk from 'chalk';
 
-export function knexfileGenerator(knexfilePath: string, projectName: string, projectRoot: string) {
-  if (!file_.exists(knexfilePath)) {
-    console.error('! knexfile path not found.');
+export type KnexfileGeneratorOpts = {
+  knexfilePath: string;
+  projectName: string;
+  projectRoot: string;
+  dbClient: string;
+}
+
+export function knexfileGenerator(opts: KnexfileGeneratorOpts) {
+  const { knexfilePath, projectName, projectRoot, dbClient } = opts;
+
+  if (file_.exists(knexfilePath)) {
+    console.log(
+      chalk.yellowBright(`${knexfilePath} already exists.`)
+    );
     return;
   }
 
@@ -26,7 +38,7 @@ const dbConnection: StaticConnectionConfig = {
 };
 
 const defaultConfig: Knex.Config = {
-  client: 'mysql2',
+  client: '${dbClient}',
   // debug: false,
   connection: dbConnection,
   pool: {
@@ -42,7 +54,7 @@ const defaultConfig: Knex.Config = {
     directory: './seeds'
   },
 
-  // //Used to discover schemas where tables are located
+  // //Used to discover schemas where tables are located. Useful for schema-based db's like postgres.
   // searchPath: [''],
 
   // Converts camelCase inputs to snake_case and also converts
@@ -51,7 +63,7 @@ const defaultConfig: Knex.Config = {
   ...knexSnakeCaseMappers()
 };
 
-const knexEnvironmentConfig = {
+const knexEnvironmentConfig: any = {
   development: {
     ...defaultConfig
   },

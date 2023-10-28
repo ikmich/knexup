@@ -1,8 +1,6 @@
 import { file_ } from '../utils/file-util.js';
 import { KNEXUP_FILENAME } from '../constants.js';
 import chalk from 'chalk';
-import fs from 'fs-extra';
-import { tableRefsContent } from './contents/table-refs.content.js';
 
 export async function knexupFileGenerator(targetDirPath: string) {
   // generate file for table refs
@@ -16,8 +14,7 @@ export async function knexupFileGenerator(targetDirPath: string) {
   }
 
   // #!/usr/bin/env node
-  const contents = `
-${tableRefsContent}
+  const contents = `// knexup.ts
 `;
 
   // write contents to file

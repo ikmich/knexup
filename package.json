@@ -13,8 +13,9 @@
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "demo-init": "npm run build && ts-node dist/bin/index.js -t user",
-    "demo-project": "npm run build && ts-node dist/bin/index.js project --path='/Users/i.agbasimalo/projects/code/knexup-projects'"
+    "demo-init": "npm run build && ts-node dist/bin/index.js -t category",
+    "demo-project": "npm run build && ts-node dist/bin/index.js project --path='/Users/i.agbasimalo/projects/code/knexup-projects'",
+    "test-parse-object": "ts-node-esm src/generator/contents/table-refs.content.ts"
   },
   "keywords": [
     "knex",

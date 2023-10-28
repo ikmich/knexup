@@ -32,6 +32,7 @@ export function tableInitFileGenerator(tableName: string, destDir: string) {
   };
 
   const camelCasedTableName = ChangeCase.camelCase(tableName);
+
   const output = initFileTemplate
     .replace(regexes.tableNameSymbol, camelCasedTableName)
     .replace(regexes.modelInterface, interfaceName)

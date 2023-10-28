@@ -1,11 +1,9 @@
 import { Command } from 'commander';
 import { tableInitFileGenerator } from '../../generator/table-init-file.generator.js';
-import { _fn, _undefined, path_, table_ } from '../../utils/index.js';
+import { table_ } from '../../utils/index.js';
 import Path from 'path';
-import fs from 'fs-extra';
 import { CliOptions } from '../../types.js';
-import { CONFIG_FILENAME, KNEXUP_DIR, KNEXUP_INIT_DIR, PROJECT_ROOT } from '../../constants.js';
-import { configUtil } from '../../utils/config-util.js';
+import { PROJECT_ROOT } from '../../constants.js';
 import { configFileGenerator } from '../../generator/config-file.generator.js';
 import { knexupUtil } from '../../utils/knexup-util.js';
 import { file_ } from '../../utils/file-util.js';
@@ -20,11 +18,11 @@ async function createKnexupFile() {
   await knexupFileGenerator(knexupDir);
 }
 
-async function createTableRefsFile() {
+async function createTableRefsFile(table?: string | null) {
   // create knexup dir
   const knexupDir = await knexupUtil.getKnexupDir();
   file_.ensureDirPath(Path.join(PROJECT_ROOT, knexupDir));
-  await tableRefsFileGenerator(knexupDir);
+  await tableRefsFileGenerator(knexupDir, table);
 }
 
 export async function processInitCommand2(command: Command) {
@@ -38,18 +36,19 @@ export async function processInitCommand2(command: Command) {
   };
 
   configFileGenerator(PROJECT_ROOT);
-  await createTableRefsFile();
   await createKnexupFile();
 
   if (opts.table?.trim()) {
     params.table = opts.table?.trim();
   }
 
-  console.log('processInitCommand2', {
+  await createTableRefsFile(params.table);
+
+  console.log('[processInitCommand2]', {
     args,
     opts,
     state: params,
-    commandTag: arg0,
+    arg0,
     arg1
   });
 
@@ -71,64 +70,64 @@ export async function processInitCommand2(command: Command) {
   console.log(chalk.yellow('no-op'));
 }
 
-export async function processInitCommand(command: Command) {
-  const opts = command.opts<CliOptions>();
-
-  let _table = '';
-
-  const args = command.args;
-
-  const [arg0, arg1] = args;
-
-  if (arg0 !== 'init') {
-    /* => The 'init' command was not explicitly typed. We thus set the table implicitly as the value of the first
-    argument. */
-    _table = arg0;
-  } else if (arg1) {
-    /* => The 'init' command was explicitly typed as well as a 2nd argument. That second argument is now implicitly
-    the value of "table". */
-    _table = arg1;
-  }
-
-  /* If table was set as an option flag, that overrides all the other arguments. */
-  if (opts.table) {
-    _table = opts.table;
-  }
-
-  console.log('[processInitCommand]', {
-    opts,
-    args,
-    _table
-  });
-
-  if (!_table) {
-    console.error('! Missing table option');
-    return;
-  }
-
-  /* Strip invalid characters from table name. */
-  if (!table_.isValidTable(_table)) {
-    throw '! Invalid table name';
-  }
-
-  const pathValue = await _fn(async () => {
-    if (opts.path && opts.path.trim()) {
-      return opts.path;
-    }
-
-    // read config file
-    let configFile = Path.join(PROJECT_ROOT, CONFIG_FILENAME);
-    if (fs.existsSync(configFile)) {
-
-      // const config = require(configFile) as KnexupConfig;
-      const config = await configUtil.readConfig();
-      if (_undefined(config?.knexupDir)) {
-        return config?.knexupDir?.replace(/^\//, '');
-      }
-    }
-
-    return KNEXUP_INIT_DIR;
-  });
-
-  tableInitFileGenerator(_table, pathValue);
-}
+// export async function processInitCommand(command: Command) {
+//   const opts = command.opts<CliOptions>();
+//
+//   let _table = '';
+//
+//   const args = command.args;
+//
+//   const [arg0, arg1] = args;
+//
+//   if (arg0 !== 'init') {
+//     /* => The 'init' command was not explicitly typed. We thus set the table implicitly as the value of the first
+//     argument. */
+//     _table = arg0;
+//   } else if (arg1) {
+//     /* => The 'init' command was explicitly typed as well as a 2nd argument. That second argument is now implicitly
+//     the value of "table". */
+//     _table = arg1;
+//   }
+//
+//   /* If table was set as an option flag, that overrides all the other arguments. */
+//   if (opts.table) {
+//     _table = opts.table;
+//   }
+//
+//   console.log('[processInitCommand]', {
+//     opts,
+//     args,
+//     _table
+//   });
+//
+//   if (!_table) {
+//     console.error('! Missing table option');
+//     return;
+//   }
+//
+//   /* Strip invalid characters from table name. */
+//   if (!table_.isValidTable(_table)) {
+//     throw '! Invalid table name';
+//   }
+//
+//   const pathValue = await _fn(async () => {
+//     if (opts.path && opts.path.trim()) {
+//       return opts.path;
+//     }
+//
+//     // read config file
+//     let configFile = Path.join(PROJECT_ROOT, CONFIG_FILENAME);
+//     if (fs.existsSync(configFile)) {
+//
+//       // const config = require(configFile) as KnexupConfig;
+//       const config = await configUtil.readConfig();
+//       if (_undefined(config?.knexupDir)) {
+//         return config?.knexupDir?.replace(/^\//, '');
+//       }
+//     }
+//
+//     return KNEXUP_INIT_DIR;
+//   });
+//
+//   tableInitFileGenerator(_table, pathValue);
+// }

@@ -4,8 +4,8 @@ import Path from 'path';
 import { newProjectGenerator } from '../../generator/project-gen/new-project.generator.js';
 import { file_ } from '../../utils/file-util.js';
 import { DEFAULT_GENERATED_PROJECT_NAME } from '../../constants.js';
-import chalk from 'chalk';
 import { _fn } from '../../utils/index.js';
+import { logError } from '../../utils/log.util.js';
 
 export async function processCreateProjectCommand(command: Command) {
   const opts = command.opts<CliOptions>();
@@ -13,7 +13,7 @@ export async function processCreateProjectCommand(command: Command) {
   const projectName = (args[1] || DEFAULT_GENERATED_PROJECT_NAME).trim();
 
   if (!projectName) {
-    console.error(chalk.red('!ERROR! No project name'));
+    logError('!ERROR! No project name');
     return;
   }
 

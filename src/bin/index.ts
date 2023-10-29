@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { processInitCommand2 } from './command/init.command.js';
+import { processInitCommand } from './command/init.command.js';
 import { processCreateProjectCommand } from './command/create-project.command.js';
 
 export const COMMAND_INIT = 'init';
@@ -20,16 +20,15 @@ program
   .command(COMMAND_INIT, { isDefault: true })
   .description('Create knexup config file for the project and generate init file for table entity')
   .action(async () => {
-    await processInitCommand2(program);
+    await processInitCommand(program);
   });
 
 program
   .command(COMMAND_PROJECT)
-  .description('Generate a knex.js project')
+  .description('Generate a project based on knex.js and objection.js')
   .action(async () => {
     await processCreateProjectCommand(program);
   });
-
 
 
 program.parse();

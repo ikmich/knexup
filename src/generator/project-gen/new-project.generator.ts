@@ -9,12 +9,13 @@ import { knexupFileGenerator } from '../knexup-file.generator.js';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { tsconfigSourceContent } from './contents/tsconfig-source.content.js';
-import { dbKnexSetupFileGenerator } from './db-knex-setup-file.generator.js';
+import { dbKnexFileGenerator } from './db-knex-file.generator.js';
 import { createRequire } from 'module';
+import { logInfo, logSuccess } from '../../utils/log.util.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = Path.dirname(__filename);
+// const __dirname = Path.dirname(__filename);
 
 /* dependencies: knex objection mysql2? pg?
 $ npm install --package-lock-only knex objection
@@ -38,22 +39,22 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
 
   file_.ensureDirPath(projectRoot);
 
-  console.log('Initializing npm...');
+  logInfo('Initializing npm...');
   // npm init
   await shell_.exec(`cd ${projectRoot} && npm init -y`);
   await updatePackageJsonFile(projectRoot);
 
-  console.log('Initializing typescript...');
+  logInfo('Initializing typescript...');
   // tsc init
   await shell_.exec(`cd ${projectRoot} && npx tsc --init`);
   updateTsconfigJsonFile(projectRoot);
 
-  console.log('Setting up dependencies...');
+  logInfo('Setting up dependencies...');
   // setup package.json
   await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only ${dependencies.join(' ')}`);
   await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only --save-dev ${devDependencies.join(' ')}`);
 
-  console.log('Generating files...');
+  logInfo('Generating files...');
   // [Generate folders]
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
@@ -87,9 +88,8 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
   const srcIndexFile = Path.join(srcDir, 'index.ts');
   file_.writeFile(srcIndexFile, `console.log('${projectName}');`);
 
-  console.log('Generating knexfile...');
+  logInfo('Generating knexfile...');
   const knexfilePath = Path.join(knexDir, 'knexfile.ts');
-  // file_.writeFile(knexfilePath, '');
   knexfileGenerator({
     knexfilePath,
     projectName,
@@ -97,16 +97,15 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
     dbClient
   });
 
-  console.log('Setting db.knex configuration...');
+  logInfo('Setting db.knex configuration...');
   const dbKnexFilePath = Path.join(dbDir, 'db.knex.ts');
-  dbKnexSetupFileGenerator(dbKnexFilePath);
-  // file_.writeFile(dbKnexFilePath, '');
+  dbKnexFileGenerator(dbKnexFilePath);
 
-  console.log('Generating knexup files...');
+  logInfo('Generating knexup files...');
   await tableRefsFileGenerator(knexupDir);
   await knexupFileGenerator(knexupDir);
 
-  console.log(`Done!`);
+  logSuccess('Done!');
 }
 
 function updateTsconfigJsonFile(projectRoot: string) {
@@ -117,9 +116,6 @@ function updateTsconfigJsonFile(projectRoot: string) {
 async function updatePackageJsonFile(projectRoot: string) {
   let packageJsonFile = Path.join(projectRoot, 'package.json');
   const config: any = require(packageJsonFile);
-  // const config: any = (await import(packageJsonFile, {
-  //   assert: { type: 'json' }
-  // }))?.default;
 
   if (config) {
     // "type"

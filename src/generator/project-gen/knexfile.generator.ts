@@ -1,5 +1,5 @@
 import { file_ } from '../../utils/file-util.js';
-import chalk from 'chalk';
+import { logNotice } from '../../utils/log.util.js';
 
 export type KnexfileGeneratorOpts = {
   knexfilePath: string;
@@ -12,9 +12,7 @@ export function knexfileGenerator(opts: KnexfileGeneratorOpts) {
   const { knexfilePath, projectName, projectRoot, dbClient } = opts;
 
   if (file_.exists(knexfilePath)) {
-    console.log(
-      chalk.yellowBright(`${knexfilePath} already exists.`)
-    );
+    logNotice(`${knexfilePath} already exists.`);
     return;
   }
 

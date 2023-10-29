@@ -25,17 +25,16 @@ ${tokens.export_const__t_eq_tableRefs_terminate}`;
 
 export async function extractTableRefsObject() {
   const logTag = '\n[extractTableRefsObject]';
-
   const dir = await knexupUtil.getKnexupDir();
   const tableRefsFile = Path.join(dir, TABLE_REFS_FILENAME);
 
   let contents = file_.readFile(tableRefsFile) || '';
 
-  const regexes = {
-    do_not_edit__start: new RegExp(`${tokens.do_not_edit__start}`, 'g'),
-    export_const_tableRefs_equals: new RegExp(`\s*${tokens.export_const_tableRefs_equals}\s*`, 'g'),
-    export_const__t_eq_tableRefs_terminate: new RegExp(`\s*${tokens.export_const__t_eq_tableRefs_terminate}\s*`, 'g')
-  };
+  // const regexes = {
+  //   do_not_edit__start: new RegExp(`${tokens.do_not_edit__start}`, 'g'),
+  //   export_const_tableRefs_equals: new RegExp(`\s*${tokens.export_const_tableRefs_equals}\s*`, 'g'),
+  //   export_const__t_eq_tableRefs_terminate: new RegExp(`\s*${tokens.export_const__t_eq_tableRefs_terminate}\s*`, 'g')
+  // };
 
   // Validate??
 

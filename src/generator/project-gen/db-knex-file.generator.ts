@@ -1,11 +1,9 @@
 import { file_ } from '../../utils/file-util.js';
-import chalk from 'chalk';
+import { logNotice } from '../../utils/log.util.js';
 
-export function dbKnexSetupFileGenerator(filePath: string) {
+export function dbKnexFileGenerator(filePath: string) {
   if (file_.exists(filePath)) {
-    console.log(
-      chalk.yellow(`(db.knex setup file) ${filePath} already exists.`)
-    );
+    logNotice(`[db.knex file] ${filePath} already exists.`);
     return;
   }
 
@@ -28,8 +26,5 @@ export const db = knex.knex(knexConfig);
 
   file_.writeFile(filePath, content);
 
-  console.log(
-    chalk.yellow(`${filePath} created.`)
-  );
-
+  logNotice(`${filePath} created.`);
 }

@@ -3,9 +3,10 @@ import { TABLE_REFS_FILENAME } from '../constants.js';
 import chalk from 'chalk';
 import { buildTableRefsContent, extractTableRefsObject } from './contents/table-refs.content.js';
 import { _fn } from '../utils/index.js';
+import { logInfo, logNotice, logWarn } from '../utils/log.util.js';
 
 export async function tableRefsFileGenerator(targetDirPath: string, table?: string | null) {
-  let logTag = '\n[tableRefsFileGenerator]';
+  let logTag = '[tableRefsFileGenerator]';
   file_.ensureDirPath(targetDirPath);
 
   let filename = TABLE_REFS_FILENAME;
@@ -20,9 +21,9 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
     return {};
   });
 
-  console.log(logTag, {
-    ob
-  });
+  // console.log(logTag, {
+  //   ob
+  // });
 
   const shouldUpdateRefsFile = true;
 
@@ -39,13 +40,13 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
           ob0 = await extractTableRefsObject();
           isExtractionSuccess = true;
         } catch (e) {
-          console.warn(chalk.yellow(`WARN - Unable to modify table-refs file. You must manually add entry for table ${table} in the table-refs object.`));
+          logWarn(`WARN - Unable to modify table-refs file. You must manually add entry for table ${table} in the table-refs object.`);
         }
 
         if (isExtractionSuccess) {
-          console.log(logTag, {
-            ob0
-          });
+          // console.log(logTag, {
+          //   ob0
+          // });
 
           // merge objects
           ob = {
@@ -53,14 +54,12 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
             ...ob
           };
 
-          console.log(logTag, 'AFTER', {
-            ob
-          });
+          // console.log(logTag, 'AFTER', {
+          //   ob
+          // });
         }
       } else {
-        console.log(
-          chalk.yellowBright(`Ensure to add entry for ${table} in the tableRefs object.`)
-        );
+        logNotice(`Ensure to add entry for ${table} in the tableRefs object.`);
       }
     }
 
@@ -71,7 +70,7 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
 
   file_.writeFile(file, buildTableRefsContent(ob));
 
-  console.log(chalk.blueBright(`${filename} created in ${targetDirPath}`));
+  logInfo(`${filename} created in ${targetDirPath}`);
 }
 
 /*export async function tableRefsFileGenerator(targetDirPath: string, table?: string | null) {

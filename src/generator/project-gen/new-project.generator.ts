@@ -130,6 +130,16 @@ async function updatePackageJsonFile(projectRoot: string) {
       node: '>=16'
     };
 
+    // "scripts"
+    config['scripts']['lint'] = `prettier --check .`;
+    config['scripts']['lint-fix'] = `prettier --write .`;
+    config['scripts']['db-migration-generate'] = `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`;
+    config['scripts']['db-migrate'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:latest --knexfile src/db/knexfile.ts`;
+    config['scripts']['db-rollback'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:rollback --knexfile src/db/knexfile.ts`;
+    config['scripts']['db-migration-list'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:list --knexfile src/db/knexfile.ts`;
+    config['scripts']['db-seed-generate'] = `NODE_OPTIONS='--loader ts-node/esm' knex seed:make --knexfile src/db/knexfile.ts -x ts`;
+    config['scripts']['db-seed'] = `NODE_OPTIONS='--loader ts-node/esm' knex seed:run --knexfile src/db/knexfile.ts`;
+
     const configJson = JSON.stringify(config, null, 2);
     fs.writeFileSync(packageJsonFile, configJson);
   }

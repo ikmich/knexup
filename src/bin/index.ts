@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { processInitCommand } from './command/init.command.js';
-import { processCreateProjectCommand } from './command/create-project.command.js';
+import { initCommandHandler } from './command/init.command-handler.js';
+import { createProjectCommandHandler } from './command/create-project.command-handler.js';
 
 export const COMMAND_INIT = 'init';
 export const COMMAND_PROJECT = 'project';
+export const COMMAND_KNEX_INIT = 'knex-init';
 
 const program = new Command();
 
@@ -18,18 +19,24 @@ program
 
 program
   .command(COMMAND_INIT, { isDefault: true })
-  .description('Create knexup config file for the project and generate init file for table entity')
+  .description('Generate init file for table entity. This also creates a knexup config file if it does not exist.')
   .action(async () => {
-    await processInitCommand(program);
+    await initCommandHandler(program);
   });
 
 program
   .command(COMMAND_PROJECT)
-  .description('Generate a project based on knex.js and objection.js')
+  .description('Generate a project based on knex.js')
   .action(async () => {
-    await processCreateProjectCommand(program);
+    await createProjectCommandHandler(program);
   });
 
+program
+  .command(COMMAND_KNEX_INIT)
+  .description('Create knex config, migrations, seeds, and npm scripts for knex.js in a project')
+  .action(async () => {
+    console.log('cmd: knex init');
+  });
 
 program.parse();
 

@@ -8,8 +8,9 @@ import { configFileGenerator } from '../../generator/config-file.generator.js';
 import { knexupUtil } from '../../utils/knexup-util.js';
 import { file_ } from '../../utils/file-util.js';
 import { tableRefsFileGenerator } from '../../generator/table-refs-file.generator.js';
-import { knexupFileGenerator } from '../../generator/knexup-file.generator.js';
+import { knexupFileGenerator } from '../../generator/knexup-gen/knexup-file.generator.js';
 import { logError, logNotice } from '../../utils/log.util.js';
+import { knexupSetupGenerator } from '../../generator/knexup-gen/knexup-setup.generator.js';
 
 async function createKnexupFile() {
   // create knexup dir
@@ -25,7 +26,7 @@ async function createTableRefsFile(table?: string | null) {
   await tableRefsFileGenerator(knexupDir, table);
 }
 
-export async function processInitCommand(command: Command) {
+export async function initCommandHandler(command: Command) {
   const opts = command.opts<CliOptions>();
   const args = command.args;
   const arg0 = args[0]?.trim() || null;
@@ -36,7 +37,9 @@ export async function processInitCommand(command: Command) {
   };
 
   configFileGenerator(PROJECT_ROOT);
-  await createKnexupFile();
+
+  const knexupDir = await knexupUtil.getKnexupDir();
+  await knexupSetupGenerator({ knexupDirPath: Path.join(PROJECT_ROOT, knexupDir) });
 
   if (opts.table?.trim()) {
     params.table = opts.table?.trim();

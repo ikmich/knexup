@@ -1,7 +1,8 @@
 export const DATETIME_PRECISION = 4;
 export const CONFIG_FILENAME = 'knexup-config.js';
+export const KNEX_DIR_NAME = 'knex';
 export const KNEXUP_DIR_NAME = 'knexup';
-export const KNEXUP_DIR = `src/db/${KNEXUP_DIR_NAME}`;
+export const KNEXUP_DIR = `src/${KNEX_DIR_NAME}/${KNEXUP_DIR_NAME}`;
 export const KNEXUP_INIT_DIR_NAME = 'init';
 export const KNEXUP_INIT_DIR = `${KNEXUP_DIR}/${KNEXUP_INIT_DIR_NAME}`;
 export const INIT_DIR_NAME = 'init';

@@ -7,7 +7,7 @@ import { DEFAULT_GENERATED_PROJECT_NAME } from '../../constants.js';
 import { _fn } from '../../utils/index.js';
 import { logError } from '../../utils/log.util.js';
 
-export async function processCreateProjectCommand(command: Command) {
+export async function createProjectCommandHandler(command: Command) {
   const opts = command.opts<CliOptions>();
   const args = command.args;
   const projectName = (args[1] || DEFAULT_GENERATED_PROJECT_NAME).trim();

@@ -1,20 +1,18 @@
 import { file_ } from '../../utils/file-util.js';
 import Path from 'path';
-import { knexfileGenerator } from './knexfile.generator.js';
 import { shell_ } from '../../utils/shell-util.js';
 import { configFileGenerator } from '../config-file.generator.js';
-import { GIT_IGNORE_CONTENTS, KNEXUP_DIR_NAME, KNEXUP_INIT_DIR_NAME, PRETTIERRC_CONTENTS } from '../../constants.js';
-import { tableRefsFileGenerator } from '../table-refs-file.generator.js';
-import { knexupFileGenerator } from '../knexup-file.generator.js';
+import { GIT_IGNORE_CONTENTS, KNEX_DIR_NAME, KNEXUP_DIR_NAME, PRETTIERRC_CONTENTS } from '../../constants.js';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
+// import { fileURLToPath } from 'url';
 import { tsconfigSourceContent } from './contents/tsconfig-source.content.js';
-import { dbKnexFileGenerator } from './db-knex-file.generator.js';
 import { createRequire } from 'module';
 import { logInfo, logSuccess } from '../../utils/log.util.js';
+import { knexSetupGenerator } from '../knex-gen/knex-setup.generator.js';
+import { knexupSetupGenerator } from '../knexup-gen/knexup-setup.generator.js';
 
 const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
+// const __filename = fileURLToPath(import.meta.url);
 // const __dirname = Path.dirname(__filename);
 
 /* dependencies: knex objection mysql2? pg?
@@ -23,7 +21,7 @@ $ npm install --package-lock-only --save-dev typescript prettier @types/node
 * */
 
 const dependencies = ['knex', 'objection', 'dotenv', 'change-case'];
-const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'slugify', 'rimraf'];
+const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'tsx', 'slugify', 'rimraf'];
 
 export async function newProjectGenerator(projectRoot: string, projectName: string, dbClient: string) {
 
@@ -39,18 +37,18 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
 
   file_.ensureDirPath(projectRoot);
 
-  logInfo('Initializing npm...');
   // npm init
+  logInfo('Initializing npm...');
   await shell_.exec(`cd ${projectRoot} && npm init -y`);
   await updatePackageJsonFile(projectRoot);
+  // tsc init
 
   logInfo('Initializing typescript...');
-  // tsc init
   await shell_.exec(`cd ${projectRoot} && npx tsc --init`);
   updateTsconfigJsonFile(projectRoot);
 
-  logInfo('Setting up dependencies...');
   // setup package.json
+  logInfo('Setting up dependencies...');
   await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only ${dependencies.join(' ')}`);
   await shell_.exec(`cd ${projectRoot} && npm install --package-lock-only --save-dev ${devDependencies.join(' ')}`);
 
@@ -59,19 +57,16 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
 
-  const dbDir = Path.join(srcDir, 'db/');
-  file_.ensureDirPath(dbDir);
+  const knexDir = Path.join(srcDir, `${KNEX_DIR_NAME}/`);
 
-  const knexDir = dbDir;
+  logInfo('Knex setup...');
+  knexSetupGenerator({
+    projectRoot, projectName, dbClient
+  });
 
-  const knexMigrationsDir = Path.join(knexDir, 'migrations/');
-  file_.ensureDirPath(knexMigrationsDir);
-
-  const knexupDir = Path.join(dbDir, KNEXUP_DIR_NAME);
-  file_.ensureDirPath(knexupDir);
-
-  const knexupInitDir = Path.join(knexupDir, KNEXUP_INIT_DIR_NAME);
-  file_.ensureDirPath(knexupInitDir);
+  logInfo('Generating knexup files...');
+  const knexupDir = Path.join(knexDir, KNEXUP_DIR_NAME);
+  await knexupSetupGenerator({ knexupDirPath: knexupDir });
 
   // [Generate files]
   configFileGenerator(projectRoot);
@@ -88,24 +83,7 @@ export async function newProjectGenerator(projectRoot: string, projectName: stri
   const srcIndexFile = Path.join(srcDir, 'index.ts');
   file_.writeFile(srcIndexFile, `console.log('${projectName}');`);
 
-  logInfo('Generating knexfile...');
-  const knexfilePath = Path.join(knexDir, 'knexfile.ts');
-  knexfileGenerator({
-    knexfilePath,
-    projectName,
-    projectRoot,
-    dbClient
-  });
-
-  logInfo('Setting db.knex configuration...');
-  const dbKnexFilePath = Path.join(dbDir, 'db.knex.ts');
-  dbKnexFileGenerator(dbKnexFilePath);
-
-  logInfo('Generating knexup files...');
-  await tableRefsFileGenerator(knexupDir);
-  await knexupFileGenerator(knexupDir);
-
-  logSuccess('Done!');
+  logSuccess('Done! Run `npm install` in the project');
 }
 
 function updateTsconfigJsonFile(projectRoot: string) {
@@ -123,13 +101,13 @@ async function updatePackageJsonFile(projectRoot: string) {
 
     // "engines"
     config['engines'] = {
-      node: '>=16'
+      node: '>=18'
     };
 
     // "scripts"
     config['scripts']['lint'] = `prettier --check .`;
     config['scripts']['lint-fix'] = `prettier --write .`;
-    config['scripts']['db-migration-generate'] = `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`;
+    config['scripts']['db-new-migration'] = `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`;
     config['scripts']['db-migrate'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:latest --knexfile src/db/knexfile.ts`;
     config['scripts']['db-rollback'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:rollback --knexfile src/db/knexfile.ts`;
     config['scripts']['db-migration-list'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:list --knexfile src/db/knexfile.ts`;

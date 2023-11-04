@@ -1,5 +1,5 @@
-import { file_ } from '../utils/file-util.js';
-import { KNEXUP_FILENAME } from '../constants.js';
+import { file_ } from '../../utils/file-util.js';
+import { KNEXUP_FILENAME } from '../../constants.js';
 import chalk from 'chalk';
 
 export async function knexupFileGenerator(targetDirPath: string) {

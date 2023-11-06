@@ -10,6 +10,7 @@ import { createRequire } from 'module';
 import { logInfo, logSuccess } from '../../utils/log.util.js';
 import { knexSetupGenerator } from '../knex-gen/knex-setup.generator.js';
 import { knexupSetupGenerator } from '../knexup-gen/knexup-setup.generator.js';
+import { packageJsonEditor } from '../../editor/package-json.editor.js';
 
 const require = createRequire(import.meta.url);
 // const __filename = fileURLToPath(import.meta.url);
@@ -92,29 +93,21 @@ function updateTsconfigJsonFile(projectRoot: string) {
 }
 
 async function updatePackageJsonFile(projectRoot: string) {
-  let packageJsonFile = Path.join(projectRoot, 'package.json');
-  const config: any = require(packageJsonFile);
-
-  if (config) {
-    // "type"
-    config['type'] = 'module';
-
-    // "engines"
-    config['engines'] = {
+  packageJsonEditor({
+    packageJsonFile: Path.join(projectRoot, 'package.json'),
+    type: 'module',
+    engines: {
       node: '>=18'
-    };
-
-    // "scripts"
-    config['scripts']['lint'] = `prettier --check .`;
-    config['scripts']['lint-fix'] = `prettier --write .`;
-    config['scripts']['db-new-migration'] = `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`;
-    config['scripts']['db-migrate'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:latest --knexfile src/db/knexfile.ts`;
-    config['scripts']['db-rollback'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:rollback --knexfile src/db/knexfile.ts`;
-    config['scripts']['db-migration-list'] = `NODE_OPTIONS='--loader ts-node/esm' knex migrate:list --knexfile src/db/knexfile.ts`;
-    config['scripts']['db-seed-generate'] = `NODE_OPTIONS='--loader ts-node/esm' knex seed:make --knexfile src/db/knexfile.ts -x ts`;
-    config['scripts']['db-seed'] = `NODE_OPTIONS='--loader ts-node/esm' knex seed:run --knexfile src/db/knexfile.ts`;
-
-    const configJson = JSON.stringify(config, null, 2);
-    fs.writeFileSync(packageJsonFile, configJson);
-  }
+    },
+    scripts: {
+      'lint': `prettier --check .`,
+      'lint-fix': `prettier --write .`,
+      'db-migration-new': `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`,
+      'db-migrate-up': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:latest --knexfile src/db/knexfile.ts`,
+      'db-migrate-down': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:rollback --knexfile src/db/knexfile.ts`,
+      'db-list-migrations': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:list --knexfile src/db/knexfile.ts`,
+      'db-seed-new': `NODE_OPTIONS='--loader ts-node/esm' knex seed:make --knexfile src/db/knexfile.ts -x ts`,
+      'db-seed': `NODE_OPTIONS='--loader ts-node/esm' knex seed:run --knexfile src/db/knexfile.ts`
+    }
+  });
 }

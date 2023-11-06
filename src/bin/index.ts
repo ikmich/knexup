@@ -14,8 +14,7 @@ program
   .description('knexup.js cli')
   .option('-p, --path <char>', 'Path relative to project root.')
   .option('-t, --table <char>', 'Database table name.')
-  .option('-d, --database-client <char>', 'The preferred database client (mysql|postgres|sqlite)')
-;
+  .option('-d, --database-client <char>', 'The preferred database client (mysql|postgres|sqlite)');
 
 program
   .command(COMMAND_INIT, { isDefault: true })

@@ -1,14 +1,14 @@
 import Path from 'path';
 import fs from 'fs-extra';
-import { CONFIG_FILENAME, KNEXUP_DIR } from '../constants.js';
+import { CONFIG_FILENAME, SCHEMA_DIR_FRAGMENT } from '../constants.js';
 import { logInfo } from '../utils/log.util.js';
 
 /**
  * Generates the knexup config file in the project root.
  */
-export function configFileGenerator(destDir: string) {
+export function ConfigFileGenerator(destDir: string) {
   const contents = `module.exports = {
-  knexupDir: '${KNEXUP_DIR}'
+  knexupDir: '${SCHEMA_DIR_FRAGMENT}'
 }`;
 
   const configFile = Path.join(destDir, CONFIG_FILENAME);

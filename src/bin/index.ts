@@ -30,12 +30,12 @@ program
     await createProjectCommandHandler(program);
   });
 
-program
-  .command(COMMAND_KNEX_INIT)
-  .description('Create knex config, migrations, seeds, and npm scripts for knex.js in a project')
-  .action(async () => {
-    console.log('cmd: knex init');
-  });
+// program
+//   .command(COMMAND_KNEX_INIT)
+//   .description('Create knex config, migrations, seeds, and npm scripts for knex.js in a project')
+//   .action(async () => {
+//     console.log('cmd: knex init');
+//   });
 
 program.parse();
 

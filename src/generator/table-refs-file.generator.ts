@@ -1,6 +1,5 @@
 import { file_ } from '../utils/file-util.js';
 import { TABLE_REFS_FILENAME } from '../constants.js';
-import chalk from 'chalk';
 import { buildTableRefsContent, extractTableRefsObject } from './contents/table-refs.content.js';
 import { _fn } from '../utils/index.js';
 import { logInfo, logNotice, logWarn } from '../utils/log.util.js';
@@ -29,9 +28,8 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
 
   if (file_.exists(file)) {
     if (table) {
-
       if (shouldUpdateRefsFile) {
-        console.log(chalk.yellow('table-refs file exists. Will attempt to update it...'));
+        logNotice('table-refs file exists. Will attempt to update it...');
 
         let ob0 = null;
         let isExtractionSuccess = false;
@@ -61,6 +59,8 @@ export async function tableRefsFileGenerator(targetDirPath: string, table?: stri
       } else {
         logNotice(`Ensure to add entry for ${table} in the tableRefs object.`);
       }
+    } else {
+      logWarn(`No table option passed.`);
     }
 
     if (!shouldUpdateRefsFile) {

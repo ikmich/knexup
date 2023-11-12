@@ -8,10 +8,9 @@ import {
 const _void = 'void';
 const tableRefsFileLabel = TABLE_REFS_FILENAME.replace(/\.ts$/, '');
 
-export const initFileTemplate = `import { Knex } from 'knex';
-// @ts-ignore
-import { TableInit } from 'knexup';
-import { _t } from '../${tableRefsFileLabel}.js';
+export const tableInitFileTemplate = `import { Knex } from 'knex';
+import { TableInit } from 'knexhelpers';
+import { tbl } from '../${tableRefsFileLabel}.js';
 
 export interface I${TEMPLATE_PATTERN_MODEL_INTERFACE} {}
 
@@ -22,7 +21,7 @@ export const ${TEMPLATE_PATTERN_TABLE_NAME_FOR_SYMBOL}Init: TableInit = {
       b.increments('id').primary();
     });
   },
-  async seed(kx: Knex): Promise<${_void}> {
+  async seed(knex: Knex): Promise<${_void}> {
     // Implement seeds if needed
   }
 }

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { CliOptions } from '../../types.js';
 import Path from 'path';
-import { newProjectGenerator } from '../../generator/project-gen/new-project.generator.js';
+import { NewProjectGenerator } from '../../generator/project-gen/new-project.generator.js';
 import { file_ } from '../../utils/file-util.js';
 import { DEFAULT_GENERATED_PROJECT_NAME } from '../../constants.js';
 import { _fn } from '../../utils/index.js';
@@ -27,7 +27,8 @@ export async function createProjectCommandHandler(command: Command) {
 
         case 'pg':
         case 'postgres':
-          return 'pg';
+        case 'postgresql':
+          return 'postgres';
 
         case 'sqlite':
         case 'sqlite3':
@@ -51,5 +52,5 @@ export async function createProjectCommandHandler(command: Command) {
 
   file_.ensureDirPath(projectRoot);
 
-  await newProjectGenerator(projectRoot, projectName, dbClient?.trim());
+  await NewProjectGenerator(projectRoot, projectName, dbClient?.trim());
 }

@@ -1,6 +1,10 @@
 .DS_Store
 .idea/
 dist/
+build/
 node_modules/
 packlib-config.js
+packlib-config.cjs
 knexup-config.js
+knexup-config.cjs
+demo*.sh

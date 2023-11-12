@@ -1,4 +1,4 @@
-import { initFileTemplate } from './templates/init-file.template.js';
+import { tableInitFileTemplate } from './templates/table-init-file.template.js';
 import pluralize from 'pluralize';
 import { _upperFirst } from '../utils/index.js';
 import {
@@ -17,7 +17,7 @@ import { logError, logWarn } from '../utils/log.util.js';
  * @param tableName
  * @param destDir
  */
-export function tableInitFileGenerator(tableName: string, destDir: string) {
+export function TableInitFileGenerator(tableName: string, destDir: string) {
 
   if (!file_.exists(destDir)) {
     logError(`!ERROR! directory path not found - ${destDir}`);
@@ -35,10 +35,10 @@ export function tableInitFileGenerator(tableName: string, destDir: string) {
 
   const camelCasedTableName = ChangeCase.camelCase(tableName);
 
-  const output = initFileTemplate
+  const output = tableInitFileTemplate
     .replace(regexes.tableNameSymbol, camelCasedTableName)
     .replace(regexes.modelInterface, interfaceName)
-    .replace(regexes.tableRef, `_t.${camelCasedTableName}`);
+    .replace(regexes.tableRef, `tbl.${camelCasedTableName}`);
 
   // write to file
   file_.ensureDirPath(destDir);
@@ -46,7 +46,7 @@ export function tableInitFileGenerator(tableName: string, destDir: string) {
   const initFile = file_.joinPaths(destDir, `${tableName}.init.ts`);
 
   if (file_.exists(initFile)) {
-    logWarn(`${tableName} init file already exists.`);
+    // logWarn(`${tableName} init file already exists.`);
     return;
   }
 

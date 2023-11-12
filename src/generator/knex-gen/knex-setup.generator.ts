@@ -1,9 +1,9 @@
 import Path from 'path';
 import { file_ } from '../../utils/file-util.js';
 import { KNEX_DIR_NAME } from '../../constants.js';
-import { knexfileGenerator } from '../project-gen/knexfile.generator.js';
-import { logInfo } from '../../utils/log.util.js';
-import { dbKnexFileGenerator } from '../project-gen/db-knex-file.generator.js';
+import { KnexfileGenerator } from './knexfile.generator.js';
+import { KnexDbConnectFileGenerator } from './knex-db-connect-file.generator.js';
+import { packageJsonUtil } from '../../utils/package-json.util.js';
 
 export type KnexSetupOpts = {
   projectRoot: string;
@@ -11,8 +11,15 @@ export type KnexSetupOpts = {
   dbClient: string;
 }
 
-export function knexSetupGenerator(opts: KnexSetupOpts) {
+export async function KnexSetupGenerator(opts: KnexSetupOpts) {
   const { projectRoot, projectName, dbClient } = opts;
+
+  const deps = ['knex', 'knexhelpers', 'objection'];
+  if (dbClient) {
+    deps.push(dbClient);
+  }
+
+  await packageJsonUtil.installDependencies(deps);
 
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
@@ -25,13 +32,13 @@ export function knexSetupGenerator(opts: KnexSetupOpts) {
 
   const knexfilePath = Path.join(knexDir, 'knexfile.ts');
 
-  knexfileGenerator({
+  KnexfileGenerator({
     knexfilePath,
     projectName,
     projectRoot,
     dbClient
   });
 
-  const dbKnexFilePath = Path.join(knexDir, 'db.ts');
-  dbKnexFileGenerator(dbKnexFilePath);
+  const dbKnexFilePath = Path.join(knexDir, 'knex.db.ts');
+  KnexDbConnectFileGenerator(dbKnexFilePath);
 }

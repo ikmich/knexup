@@ -1,30 +1,16 @@
 import { Command } from 'commander';
-import { tableInitFileGenerator } from '../../generator/table-init-file.generator.js';
+import { TableInitFileGenerator } from '../../generator/table-init-file.generator.js';
 import { table_ } from '../../utils/index.js';
 import Path from 'path';
 import { CliOptions } from '../../types.js';
-import { PROJECT_ROOT } from '../../constants.js';
-import { configFileGenerator } from '../../generator/config-file.generator.js';
+import { CONFIG_FILENAME, PROJECT_ROOT } from '../../constants.js';
+import { ConfigFileGenerator } from '../../generator/config-file.generator.js';
 import { knexupUtil } from '../../utils/knexup-util.js';
 import { file_ } from '../../utils/file-util.js';
-import { tableRefsFileGenerator } from '../../generator/table-refs-file.generator.js';
-import { knexupFileGenerator } from '../../generator/knexup-gen/knexup-file.generator.js';
-import { logError, logNotice } from '../../utils/log.util.js';
-import { knexupSetupGenerator } from '../../generator/knexup-gen/knexup-setup.generator.js';
-
-async function createKnexupFile() {
-  // create knexup dir
-  const knexupDir = await knexupUtil.getKnexupDir();
-  file_.ensureDirPath(Path.join(PROJECT_ROOT, knexupDir));
-  await knexupFileGenerator(knexupDir);
-}
-
-async function createTableRefsFile(table?: string | null) {
-  // create knexup dir
-  const knexupDir = await knexupUtil.getKnexupDir();
-  file_.ensureDirPath(Path.join(PROJECT_ROOT, knexupDir));
-  await tableRefsFileGenerator(knexupDir, table);
-}
+import { logError } from '../../utils/log.util.js';
+import { KnexupSetupGenerator } from '../../generator/knexup-gen/knexup-setup.generator.js';
+import { KnexSetupGenerator } from '../../generator/knex-gen/knex-setup.generator.js';
+import { GitignoreEditor } from '../../editor/gitignore.editor.js';
 
 export async function initCommandHandler(command: Command) {
   const opts = command.opts<CliOptions>();
@@ -36,16 +22,23 @@ export async function initCommandHandler(command: Command) {
     table: null as string | null
   };
 
-  configFileGenerator(PROJECT_ROOT);
-
-  const knexupDir = await knexupUtil.getKnexupDir();
-  await knexupSetupGenerator({ knexupDirPath: Path.join(PROJECT_ROOT, knexupDir) });
-
   if (opts.table?.trim()) {
     params.table = opts.table?.trim();
   }
 
-  await createTableRefsFile(params.table);
+  ConfigFileGenerator(PROJECT_ROOT);
+
+  const tableInitDirFragment = await knexupUtil.getKnexupDirFragment();
+  await KnexupSetupGenerator({
+    knexupDirPath: Path.join(PROJECT_ROOT, tableInitDirFragment),
+    table: params.table || undefined
+  });
+
+  await KnexSetupGenerator({
+    projectRoot: PROJECT_ROOT,
+    projectName: knexupUtil.getTargetProjectName(),
+    dbClient: opts.databaseClient ?? 'postgres'
+  });
 
   // console.log('[processInitCommand2]', {
   //   args,
@@ -62,13 +55,17 @@ export async function initCommandHandler(command: Command) {
       return;
     }
 
-    const destDir = await knexupUtil.getInitDir();
-    file_.ensureDirPath(destDir);
+    // const destDir = await knexupUtil.getTableInitDirFragment();
+    const destDir = await knexupUtil.getTableInitDirPath();
+    // file_.ensureDirPath(Path.join(PROJECT_ROOT, destDir));
+    file_.ensureDirPath(Path.join(destDir));
 
-    tableInitFileGenerator(params.table, destDir);
-
-    return;
+    TableInitFileGenerator(params.table, destDir);
   }
 
-  logNotice('no-op');
+  // Update gitignore file (knexup-config.(c)js)
+  GitignoreEditor({
+    projectRoot: PROJECT_ROOT,
+    newLines: [CONFIG_FILENAME]
+  });
 }

@@ -1,18 +1,30 @@
 import { configUtil } from './config-util.js';
-import { INIT_DIR_NAME, KNEXUP_DIR } from '../constants.js';
+import { PROJECT_ROOT, SCHEMA_DIR_FRAGMENT, TABLE_INIT_DEST_DIR_FRAGMENT } from '../constants.js';
 import { path_ } from './index.js';
+import { createRequire } from 'module';
+import Path from 'path';
+
+const require = createRequire(import.meta.url);
 
 export const knexupUtil = {
-  async getKnexupDir(): Promise<string> {
+  async getKnexupDirFragment(): Promise<string> {
     const config = await configUtil.readConfig();
     if (config?.knexupDir) {
       return path_.removeLeadingSlash(config.knexupDir);
     }
-    return KNEXUP_DIR;
+    return SCHEMA_DIR_FRAGMENT;
   },
 
-  async getInitDir(): Promise<string> {
-    let knexupDir = await this.getKnexupDir();
-    return `${knexupDir}/${INIT_DIR_NAME}`;
+  async getTableInitDirPath(): Promise<string> {
+    return Path.join(PROJECT_ROOT, TABLE_INIT_DEST_DIR_FRAGMENT);
+  },
+
+  getTargetProjectName(): string {
+    const pkgJsonFile = Path.join(PROJECT_ROOT, 'package.json');
+    const config = require(pkgJsonFile);
+    if (config) {
+      return config['name'];
+    }
+    return '';
   }
 };

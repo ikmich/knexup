@@ -8,11 +8,11 @@ export type KnexfileGeneratorOpts = {
   dbClient: string;
 }
 
-export function knexfileGenerator(opts: KnexfileGeneratorOpts) {
+export function KnexfileGenerator(opts: KnexfileGeneratorOpts) {
   const { knexfilePath, projectName, projectRoot, dbClient } = opts;
 
   if (file_.exists(knexfilePath)) {
-    logNotice(`${knexfilePath} already exists.`);
+    // logNotice(`${knexfilePath} already exists.`);
     return;
   }
 
@@ -23,21 +23,18 @@ import StaticConnectionConfig = Knex.StaticConnectionConfig;
 
 const dbConnection: StaticConnectionConfig = {
   host: 'db-host',
-  port: 3306,
+  port: 1234,
   database: 'db-name',
   user: 'connection-user',
   password: 'connection-password',
-
   // /* this works for mysql driver */
   // timezone: 'utc',
-
   /* this works for mysql2 driver */
   timezone: '+00:00'
 };
 
 const defaultConfig: Knex.Config = {
   client: '${dbClient}',
-  // debug: false,
   connection: dbConnection,
   pool: {
     min: 2,
@@ -62,28 +59,22 @@ const defaultConfig: Knex.Config = {
 };
 
 const knexEnvironmentConfig: any = {
-  development: {
-    ...defaultConfig
-  },
+  development: { 
+  ...defaultConfig,
+  // debug: true,
+},
 
-  staging: {
-    ...defaultConfig
-  },
-
-  production: {
-    ...defaultConfig
-  },
+  staging: { ...defaultConfig },
+  production: { ...defaultConfig },
 
   test: {
     ...defaultConfig,
-    ...{
-      client: 'sqlite3',
-      connection: {
-        filename: Path.join('.', 'test-db.sqlite')
-      }
+    client: 'sqlite3',
+    connection: {
+      filename: Path.join('.', 'test-db.sqlite')
     },
     useNullAsDefault: true,
-    debug: false
+    // debug: true,
   }
 };
 

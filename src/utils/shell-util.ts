@@ -2,7 +2,7 @@ import { exec, ExecException } from 'child_process';
 
 export const shell_ = {
   exec: (command: string) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       exec(command, (error: ExecException | null, stdout: string, stderr: string) => {
         if (error) {
           reject(error);

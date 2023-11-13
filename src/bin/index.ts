@@ -18,7 +18,7 @@ program
 
 program
   .command(COMMAND_INIT, { isDefault: true })
-  .description('Generate init file for table entity. This also creates a knexup config file if it does not exist.')
+  .description('Initialize a project for Knex development. Generates TableInit migration helper object for table "create" migration. Also creates a knexup config file if it does not exist.')
   .action(async () => {
     await initCommandHandler(program);
   });
@@ -26,6 +26,7 @@ program
 program
   .command(COMMAND_PROJECT)
   .description('Generate a project based on knex.js')
+  .argument('projectName', 'Name of the project. Use with the "project" command.')
   .action(async () => {
     await createProjectCommandHandler(program);
   });

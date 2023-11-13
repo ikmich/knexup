@@ -4,33 +4,17 @@ import { shell_ } from '../../utils/shell-util.js';
 import { ConfigFileGenerator } from '../config-file.generator.js';
 import { GIT_IGNORE_CONTENTS, KNEX_DIR_NAME, PRETTIERRC_CONTENTS } from '../../constants.js';
 import fs from 'fs-extra';
-// import { fileURLToPath } from 'url';
 import { tsconfigSourceContent } from './contents/tsconfig-source.content.js';
-import { createRequire } from 'module';
 import { logInfo, logSuccess } from '../../utils/log.util.js';
 import { KnexSetupGenerator } from '../knex-gen/knex-setup.generator.js';
 import { KnexupSetupGenerator } from '../knexup-gen/knexup-setup.generator.js';
 import { PackageJsonEditor } from '../../editor/package-json.editor.js';
 
-const require = createRequire(import.meta.url);
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = Path.dirname(__filename);
-
-/* dependencies: knex objection mysql2? pg?
-$ npm install --package-lock-only knex objection
-$ npm install --package-lock-only --save-dev typescript prettier @types/node
-* */
-
-const dependencies = ['knex', 'objection', 'dotenv', 'change-case'];
+// todo - move to global constant
+const dependencies = ['knex', 'knexhelpers', 'objection', 'dotenv', 'change-case'];
 const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'tsx', 'slugify', 'rimraf'];
 
 export async function NewProjectGenerator(projectRoot: string, projectName: string, dbClient: string) {
-
-  // console.log('[projectGenerator]', {
-  //   projectRoot,
-  //   // dependencies,
-  //   // devDependencies
-  // });
 
   if (dbClient) {
     dependencies.push(dbClient);

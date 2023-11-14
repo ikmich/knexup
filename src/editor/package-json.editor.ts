@@ -2,17 +2,18 @@ import { file_ } from '../utils/file-util.js';
 import { logError, logWarn } from '../utils/log.util.js';
 import fs from 'fs-extra';
 import { createRequire } from 'module';
+
 const require = createRequire(import.meta.url);
 
 export type PackageJsonEditorOpts = {
   packageJsonFile: string;
   scripts?: Record<string, string>;
-  type?: string;
+  moduleType?: string;
   engines?: Record<string, any>
 }
 
 export function PackageJsonEditor(opts: PackageJsonEditorOpts) {
-  const { packageJsonFile, scripts, type, engines } = opts;
+  const { packageJsonFile, scripts, moduleType, engines } = opts;
 
   if (!file_.exists(packageJsonFile)) {
     logWarn(`${packageJsonFile} does not exist.`);
@@ -30,25 +31,28 @@ export function PackageJsonEditor(opts: PackageJsonEditorOpts) {
   let edited = false;
 
   if (scripts) {
-    config['scripts'] = scripts;
+    config['scripts'] = {
+      ...config['scripts'],
+      ...scripts
+    };
     edited = true;
   }
 
-  if (type) {
-    config['type'] = type;
+  if (typeof moduleType == 'string') {
+    config['type'] = moduleType;
     edited = true;
   }
 
   if (engines) {
-    config['engines'] = engines;
+    config['engines'] = {
+      ...config['engines'],
+      ...engines
+    };
     edited = true;
   }
 
   if (edited) {
     const configJson = JSON.stringify(config, null, 2);
-    console.log({
-      configJson
-    });
 
     fs.writeFileSync(packageJsonFile, configJson);
   }

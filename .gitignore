@@ -8,3 +8,4 @@ packlib-config.cjs
 knexup-config.js
 knexup-config.cjs
 demo*.sh
+dev/

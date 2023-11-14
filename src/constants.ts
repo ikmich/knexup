@@ -21,7 +21,7 @@ export const GIT_IGNORE_CONTENTS = `node_modules/
 dist/
 .idea/
 .vscode/
-.DS_Store/
+.DS_Store
 .env
 `;
 

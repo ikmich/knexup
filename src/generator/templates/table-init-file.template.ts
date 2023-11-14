@@ -12,7 +12,7 @@ export const tableInitFileTemplate = `import { Knex } from 'knex';
 import { TableInit } from 'knexhelpers';
 import { tbl } from '../${tableRefsFileLabel}.js';
 
-export interface I${TEMPLATE_PATTERN_MODEL_INTERFACE} {}
+export interface ${TEMPLATE_PATTERN_MODEL_INTERFACE}Record {}
 
 export const ${TEMPLATE_PATTERN_TABLE_NAME_FOR_SYMBOL}Init: TableInit = {
   async create(knex: Knex): Promise<${_void}> {

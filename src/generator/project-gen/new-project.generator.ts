@@ -79,19 +79,9 @@ function updateTsconfigJsonFile(projectRoot: string) {
 async function updatePackageJsonFile(projectRoot: string) {
   PackageJsonEditor({
     packageJsonFile: Path.join(projectRoot, 'package.json'),
-    type: 'module',
+    moduleType: 'module',
     engines: {
       node: '>=18'
-    },
-    scripts: {
-      'lint': `prettier --check .`,
-      'lint-fix': `prettier --write .`,
-      'db-migration-new': `knex migrate:make -x ts --knexfile src/db/knexfile.ts --esm`,
-      'db-migrate-up': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:latest --knexfile src/db/knexfile.ts`,
-      'db-migrate-down': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:rollback --knexfile src/db/knexfile.ts`,
-      'db-list-migrations': `NODE_OPTIONS='--loader ts-node/esm' knex migrate:list --knexfile src/db/knexfile.ts`,
-      'db-seed-new': `NODE_OPTIONS='--loader ts-node/esm' knex seed:make --knexfile src/db/knexfile.ts -x ts`,
-      'db-seed': `NODE_OPTIONS='--loader ts-node/esm' knex seed:run --knexfile src/db/knexfile.ts`
     }
   });
 }

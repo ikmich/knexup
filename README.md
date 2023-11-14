@@ -52,4 +52,4 @@ The following dependencies are installed auto-installed by `knexup`:
 - [dotenv](https://www.npmjs.com/package/dotenv)
 - [change-case](https://www.npmjs.com/package/change-case)
 - [knexhelpers](https://www.npmjs.com/package/knexhelpers)
-- Whichever database connection client is specified in the cli options.
+- Whichever database connection client is specified in the cli options. Defaults to `sqlite3`

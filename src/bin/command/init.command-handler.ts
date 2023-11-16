@@ -14,9 +14,6 @@ import { GitignoreEditor } from '../../editor/gitignore.editor.js';
 
 export async function initCommandHandler(command: Command) {
   const opts = command.opts<CliOptions>();
-  const args = command.args;
-  const arg0 = args[0]?.trim() || null;
-  const arg1 = args[1]?.trim() || null;
 
   const params = {
     table: null as string | null
@@ -28,7 +25,7 @@ export async function initCommandHandler(command: Command) {
 
   ConfigFileGenerator(PROJECT_ROOT);
 
-  const tableInitDirFragment = await knexupUtil.getKnexupDirFragment();
+  const tableInitDirFragment = await knexupUtil.getKnexupDirStub();
   await KnexupSetupGenerator({
     knexupDirPath: Path.join(PROJECT_ROOT, tableInitDirFragment),
     table: params.table || undefined
@@ -40,14 +37,6 @@ export async function initCommandHandler(command: Command) {
     dbClient: opts.databaseClient ?? 'postgres'
   });
 
-  // console.log('[processInitCommand2]', {
-  //   args,
-  //   opts,
-  //   state: params,
-  //   arg0,
-  //   arg1
-  // });
-
   if (params.table) {
     /* Validate table name. */
     if (!table_.isValidTable(params.table)) {
@@ -55,9 +44,7 @@ export async function initCommandHandler(command: Command) {
       return;
     }
 
-    // const destDir = await knexupUtil.getTableInitDirFragment();
     const destDir = await knexupUtil.getTableInitDirPath();
-    // file_.ensureDirPath(Path.join(PROJECT_ROOT, destDir));
     file_.ensureDirPath(Path.join(destDir));
 
     TableInitFileGenerator(params.table, destDir);

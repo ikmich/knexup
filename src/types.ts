@@ -3,7 +3,10 @@ export type TableRefs = {
 };
 
 export type KnexupConfig = {
-  knexupDir?: string;
+  /**
+   * The knex folder path relative to the project root.
+   */
+  knexDirFragment?: string;
 };
 
 export type CliOptions = {

@@ -1,5 +1,5 @@
 import { configUtil } from './config-util.js';
-import { PROJECT_ROOT, SCHEMA_DIR_FRAGMENT, TABLE_INIT_DEST_DIR_FRAGMENT } from '../constants.js';
+import { PROJECT_ROOT, SCHEMA_DIR_FRAGMENT, SCHEMA_DIR_NAME, TABLE_INIT_DIR_NAME } from '../constants.js';
 import { path_ } from './index.js';
 import { createRequire } from 'module';
 import Path from 'path';
@@ -7,16 +7,18 @@ import Path from 'path';
 const require = createRequire(import.meta.url);
 
 export const knexupUtil = {
-  async getKnexupDirFragment(): Promise<string> {
+  async getKnexupDirStub(): Promise<string> {
     const config = await configUtil.readConfig();
-    if (config?.knexupDir) {
-      return path_.removeLeadingSlash(config.knexupDir);
+    if (config?.knexDirFragment) {
+      const knexDirPathStub = path_.removeLeadingSlash(config.knexDirFragment);
+      return `${knexDirPathStub}/${SCHEMA_DIR_NAME}`;
     }
     return SCHEMA_DIR_FRAGMENT;
   },
 
   async getTableInitDirPath(): Promise<string> {
-    return Path.join(PROJECT_ROOT, TABLE_INIT_DEST_DIR_FRAGMENT);
+    const knexDirStub = await this.getKnexupDirStub();
+    return Path.join(PROJECT_ROOT, knexDirStub, TABLE_INIT_DIR_NAME);
   },
 
   getTargetProjectName(): string {

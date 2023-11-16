@@ -25,17 +25,10 @@ ${tokens.export_const__t_eq_tableRefs}`;
 }
 
 export async function extractTableRefsObject() {
-  const logTag = '\n[extractTableRefsObject]';
-  const dir = await knexupUtil.getKnexupDirFragment();
+  const dir = await knexupUtil.getKnexupDirStub();
   const tableRefsFile = Path.join(dir, TABLE_REFS_FILENAME);
 
   let contents = file_.readFile(tableRefsFile) || '';
-
-  // const regexes = {
-  //   do_not_edit__start: new RegExp(`${tokens.do_not_edit__start}`, 'g'),
-  //   export_const_tableRefs_equals: new RegExp(`\s*${tokens.export_const_tableRefs_equals}\s*`, 'g'),
-  //   export_const__t_eq_tableRefs_terminate: new RegExp(`\s*${tokens.export_const__t_eq_tableRefs_terminate}\s*`, 'g')
-  // };
 
   // Validate??
 
@@ -46,17 +39,7 @@ export async function extractTableRefsObject() {
     .replace(/\s/g, '')
     .replace(/;+$/, '');
 
-  // console.log(logTag, {
-  //   contents
-  // });
-
-  const ob = parseObjectString(contents);
-  // console.log(logTag, {
-  //   ob
-  // });
-
-  // return {};
-  return ob;
+  return parseObjectString(contents);
 }
 
 function printObj(obj: Record<string, string>): string {
@@ -82,11 +65,9 @@ function parseObjectString(s: string): Record<string, string> {
 
   // split by comma
   let entries = _s.split(/\s*,+\s*/);
-  // console.log({ entries });
 
   for (let entry of entries) {
     const pair = entry.split(/\s*:\s*/);
-    // console.log({ pair });
 
     const k = pair[0];
     const v = pair[1]?.replace(/'/g, '');
@@ -95,12 +76,5 @@ function parseObjectString(s: string): Record<string, string> {
     }
   }
 
-  // console.log({ obj });
-
   return obj;
 }
-
-// parseObjectString(printObj({
-//   user: 'user',
-//   session: 'session'
-// }));

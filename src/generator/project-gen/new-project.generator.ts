@@ -2,17 +2,18 @@ import { file_ } from '../../utils/file-util.js';
 import Path from 'path';
 import { shell_ } from '../../utils/shell-util.js';
 import { ConfigFileGenerator } from '../config-file.generator.js';
-import { GIT_IGNORE_CONTENTS, KNEX_DIR_NAME, PRETTIERRC_CONTENTS } from '../../constants.js';
+import { GIT_IGNORE_CONTENTS, PRETTIERRC_CONTENTS } from '../../constants.js';
 import fs from 'fs-extra';
 import { tsconfigSourceContent } from './contents/tsconfig-source.content.js';
 import { logInfo, logSuccess } from '../../utils/log.util.js';
 import { KnexSetupGenerator } from '../knex-gen/knex-setup.generator.js';
 import { KnexupSetupGenerator } from '../knexup-gen/knexup-setup.generator.js';
 import { PackageJsonEditor } from '../../editor/package-json.editor.js';
+import { knexupUtil } from '../../utils/knexup-util.js';
 
 // todo - move to global constant
-const dependencies = ['knex', 'knexhelpers', 'objection', 'dotenv', 'change-case'];
-const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'tsx', 'slugify', 'rimraf'];
+const dependencies = ['knex', 'knexhelpers', 'objection', 'dotenv'];
+const devDependencies = ['@faker-js/faker', '@types/node', 'prettier', 'typescript', 'ts-node', 'tsx'];
 
 export async function NewProjectGenerator(projectRoot: string, projectName: string, dbClient: string) {
 
@@ -42,7 +43,9 @@ export async function NewProjectGenerator(projectRoot: string, projectName: stri
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
 
-  const knexDir = Path.join(srcDir, `${KNEX_DIR_NAME}/`);
+  const knexDirSegment = await knexupUtil.getKnexDirSegment();
+  const knexDirPath = Path.join(projectRoot, knexDirSegment);
+  // const knexDir = Path.join(srcDir, `${KNEX_DIR_NAME_DEFAULT}/`);
 
   logInfo('Knex setup...');
   await KnexSetupGenerator({
@@ -50,8 +53,7 @@ export async function NewProjectGenerator(projectRoot: string, projectName: stri
   });
 
   logInfo('Generating knexup files...');
-  // const knexupDir = Path.join(knexDir, KNEXUP_DIR_NAME);
-  await KnexupSetupGenerator({ knexupDirPath: knexDir });
+  await KnexupSetupGenerator({ projectRoot });
 
   // [Generate files]
   ConfigFileGenerator(projectRoot);

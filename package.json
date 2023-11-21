@@ -1,6 +1,6 @@
 {
   "name": "knexup",
-  "version": "0.0.4-alpha",
+  "version": "0.1.0-alpha",
   "description": "A cli project starter/helper to get up and running with Knex.js projects.",
   "main": "./dist/index.js",
   "type": "module",

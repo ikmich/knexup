@@ -1,5 +1,4 @@
 import { file_ } from '../../utils/file-util.js';
-import { logNotice } from '../../utils/log.util.js';
 
 export type KnexfileGeneratorOpts = {
   knexfilePath: string;

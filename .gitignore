@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+.vscode
 dist/
 build/
 node_modules/
@@ -9,3 +10,4 @@ knexup-config.js
 knexup-config.cjs
 demo*.sh
 dev/
+_dev/

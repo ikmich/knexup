@@ -18,9 +18,9 @@ export const path_ = {
   removeLeadingSlash(s: string): string {
     return s.replace(/^\/+/, '');
   }
-}
+};
 
-export const table_ = {
+export const tableUtil = {
   isValidTable(table: string): boolean {
     if (!table) return false;
 

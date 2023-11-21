@@ -19,6 +19,12 @@ export const knexConfig: Knex.Config = knexEnvironmentConfig[process.env.NODE_EN
  */
 export const db = knex.knex(knexConfig);
 
+export function connectDb(databaseName: string) {
+  const config: typeof knexConfig = Object.assign({}, knexConfig, {});
+  config['connection']['database'] = databaseName;
+  return knex(config);
+}
+
 /* Configure Objection.js Model. Uncomment if using Objection.js */
 // Model.knex(db);
 `;

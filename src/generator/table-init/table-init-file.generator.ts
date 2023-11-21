@@ -1,16 +1,15 @@
-import { tableInitFileTemplate } from './templates/table-init-file.template.js';
+import { tableInitFileTemplate } from '../templates/table-init-file.template.js';
 import pluralize from 'pluralize';
-import { _upperFirst } from '../utils/index.js';
+import { _upperFirst } from '../../utils/index.js';
 import {
   TEMPLATE_PATTERN_MODEL_INTERFACE,
   TEMPLATE_PATTERN_TABLE_NAME,
   TEMPLATE_PATTERN_TABLE_NAME_FOR_SYMBOL,
   TEMPLATE_PATTERN_TABLE_REF
-} from '../constants.js';
+} from '../../constants.js';
 import * as ChangeCase from 'change-case';
-import { file_ } from '../utils/file-util.js';
-import chalk from 'chalk';
-import { logError, logWarn } from '../utils/log.util.js';
+import { file_ } from '../../utils/file-util.js';
+import { logError } from '../../utils/log.util.js';
 
 /**
  * Generate init file for a single table entity.

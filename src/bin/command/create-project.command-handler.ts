@@ -3,14 +3,14 @@ import { CliOptions } from '../../types.js';
 import Path from 'path';
 import { NewProjectGenerator } from '../../generator/project-gen/new-project.generator.js';
 import { file_ } from '../../utils/file-util.js';
-import { DEFAULT_GENERATED_PROJECT_NAME } from '../../constants.js';
+import { GENERATED_PROJECT_NAME_DEFAULT } from '../../constants.js';
 import { _fn } from '../../utils/index.js';
 import { logError } from '../../utils/log.util.js';
 
 export async function createProjectCommandHandler(command: Command) {
   const opts = command.opts<CliOptions>();
   const args = command.args;
-  const projectName = (args[1] || DEFAULT_GENERATED_PROJECT_NAME).trim();
+  const projectName = (args[1] || GENERATED_PROJECT_NAME_DEFAULT).trim();
 
   if (!projectName) {
     logError('!ERROR! No project name');

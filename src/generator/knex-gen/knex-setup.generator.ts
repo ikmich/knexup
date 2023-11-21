@@ -1,10 +1,10 @@
 import Path from 'path';
 import { file_ } from '../../utils/file-util.js';
-import { KNEX_DIR_FRAGMENT, KNEX_DIR_NAME } from '../../constants.js';
 import { KnexfileGenerator } from './knexfile.generator.js';
 import { KnexDbConnectFileGenerator } from './knex-db-connect-file.generator.js';
 import { packageJsonUtil } from '../../utils/package-json.util.js';
 import { PackageJsonEditor } from '../../editor/package-json.editor.js';
+import { knexupUtil } from '../../utils/knexup-util.js';
 
 export type KnexSetupOpts = {
   projectRoot: string;
@@ -27,7 +27,9 @@ export async function KnexSetupGenerator(opts: KnexSetupOpts) {
   await pkgJsonUtil.installDevDependencies(devDeps);
 
   /* Add knex commands to scripts */
-  const pathFragment = KNEX_DIR_FRAGMENT.replace(/\/+$/, '');
+  const knexDirSegment = await knexupUtil.getKnexDirSegment();
+  const pathFragment = knexDirSegment.replace(/\/+$/, '');
+
   PackageJsonEditor({
     packageJsonFile: Path.join(projectRoot, 'package.json'),
     scripts: {
@@ -44,13 +46,14 @@ export async function KnexSetupGenerator(opts: KnexSetupOpts) {
   const srcDir = Path.join(projectRoot, 'src/');
   file_.ensureDirPath(srcDir);
 
-  const knexDir = Path.join(srcDir, `${KNEX_DIR_NAME}/`);
-  file_.ensureDirPath(knexDir);
+  // const knexDirStub = await knexupUtil.getKnexDirSegment();
+  const knexDirPath = Path.join(projectRoot, `${knexDirSegment}`);
+  file_.ensureDirPath(knexDirPath);
 
-  const knexMigrationsDir = Path.join(knexDir, 'migrations/');
+  const knexMigrationsDir = Path.join(knexDirPath, 'migrations/');
   file_.ensureDirPath(knexMigrationsDir);
 
-  const knexfilePath = Path.join(knexDir, 'knexfile.ts');
+  const knexfilePath = Path.join(knexDirPath, 'knexfile.ts');
 
   KnexfileGenerator({
     knexfilePath,
@@ -59,6 +62,6 @@ export async function KnexSetupGenerator(opts: KnexSetupOpts) {
     dbClient
   });
 
-  const dbKnexFilePath = Path.join(knexDir, 'knex.db.ts');
+  const dbKnexFilePath = Path.join(knexDirPath, 'knex.db.ts');
   KnexDbConnectFileGenerator(dbKnexFilePath);
 }

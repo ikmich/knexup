@@ -1,13 +1,13 @@
 import { KnexupConfig } from '../types.js';
 import Path from 'path';
-import { CONFIG_FILENAME, PROJECT_ROOT } from '../constants.js';
+import { CONFIG_FILENAME, PROJECT_ROOT_DEFAULT } from '../constants.js';
 import { file_ } from './file-util.js';
 import { temporaryDirectory } from 'tempy';
 
 export const configUtil = {
   async readConfig(): Promise<KnexupConfig | null> {
 
-    const configFile = Path.join(PROJECT_ROOT, CONFIG_FILENAME);
+    const configFile = Path.join(PROJECT_ROOT_DEFAULT, CONFIG_FILENAME);
     if (!file_.exists(configFile)) {
       return null;
     }
@@ -27,8 +27,6 @@ export const configUtil = {
     // rename extension to .cjs
     const contents = file_.readFile(tempFile);
     file_.writeFile(tempFileCjs, contents);
-
-    // todo - delete original temp file
 
     // console.log('[config-util]', {
     //   tempConfigFile: tempFile,

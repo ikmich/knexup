@@ -1,9 +1,6 @@
 import { file_ } from '../utils/file-util.js';
 import { logError, logWarn } from '../utils/log.util.js';
 import fs from 'fs-extra';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
 
 export type PackageJsonEditorOpts = {
   packageJsonFile: string;
@@ -20,8 +17,7 @@ export function PackageJsonEditor(opts: PackageJsonEditorOpts) {
     return;
   }
 
-  const config = require(packageJsonFile);
-  // const config = fs.readJsonSync(packageJsonFile)
+  const config = fs.readJsonSync(packageJsonFile);
 
   if (!config) {
     logError('Unable to read package.json file');
@@ -53,7 +49,6 @@ export function PackageJsonEditor(opts: PackageJsonEditorOpts) {
 
   if (edited) {
     const configJson = JSON.stringify(config, null, 2);
-
     fs.writeFileSync(packageJsonFile, configJson);
   }
 

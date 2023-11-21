@@ -1,11 +1,14 @@
-import { file_ } from '../utils/file-util.js';
-import { TABLE_REFS_FILENAME } from '../constants.js';
-import { buildTableRefsContent, extractTableRefsObject } from './contents/table-refs.content.js';
-import { _fn } from '../utils/index.js';
-import { logInfo, logNotice, logWarn } from '../utils/log.util.js';
+import { file_ } from '../../utils/file-util.js';
+import { SCHEMA_DIR_NAME_DEFAULT, TABLE_REFS_FILENAME } from '../../constants.js';
+import { buildTableRefsContent, extractTableRefsObject } from '../contents/table-refs.content.js';
+import { _fn } from '../../utils/index.js';
+import { logInfo, logNotice, logWarn } from '../../utils/log.util.js';
+import Path from 'path';
 
-export async function tableRefsFileGenerator(targetDirPath: string, table?: string | null) {
+export async function TableRefsFileGenerator(knexDirPath: string, table?: string | null) {
   let logTag = '[tableRefsFileGenerator]';
+
+  const targetDirPath = Path.join(knexDirPath, SCHEMA_DIR_NAME_DEFAULT);
   file_.ensureDirPath(targetDirPath);
 
   let filename = TABLE_REFS_FILENAME;

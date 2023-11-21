@@ -6,11 +6,11 @@ export type KnexupConfig = {
   /**
    * The knex folder path relative to the project root.
    */
-  knexDirFragment?: string;
+  knexDir?: string;
 };
 
 export type CliOptions = {
-  table?: string;
+  table?: string | string[];
   path?: string;
   databaseClient?: string;
 };

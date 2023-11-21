@@ -1,10 +1,8 @@
 import Path from 'path';
-import { createRequire } from 'module';
 import { file_ } from './file-util.js';
 import { logError, logNotice } from './log.util.js';
 import { shell_ } from './shell-util.js';
-
-const require = createRequire(import.meta.url);
+import fs from 'fs-extra';
 
 export type PkgJsonUtilInitOpts = {
   projectRoot: string;
@@ -20,11 +18,11 @@ class PkgJsonUtil {
   isDependencyInstalled(dependencyName: string): boolean {
     const pkgJsonFile = Path.join(this.projectRoot, 'package.json');
     if (!file_.exists(pkgJsonFile)) {
-      logNotice(`notice: package.json not found in ${this.projectRoot}.`);
+      // logNotice(`notice: package.json not found in ${this.projectRoot}.`);
       return false;
     }
 
-    const pkgConfig = require(pkgJsonFile) || {};
+    const pkgConfig = fs.readJsonSync(pkgJsonFile) || {};
     const dependenciesMap = pkgConfig['dependencies'] || {};
     const devDependenciesMap = pkgConfig['devDependencies'] || {};
 

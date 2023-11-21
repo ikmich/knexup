@@ -1,9 +1,9 @@
-import { tableRefsFileGenerator } from '../table-refs-file.generator.js';
 import { file_ } from '../../utils/file-util.js';
+import { TableInitSetupGenerator } from '../table-init/table-init-setup.generator.js';
 
 export type KnexupSetupOpts = {
-  knexupDirPath: string;
-  table?: string;
+  projectRoot: string;
+  tables?: string[];
 }
 
 /**
@@ -11,8 +11,12 @@ export type KnexupSetupOpts = {
  * @param opts
  */
 export async function KnexupSetupGenerator(opts: KnexupSetupOpts) {
-  const { knexupDirPath, table } = opts;
-  file_.ensureDirPath(knexupDirPath);
+  const { projectRoot, tables = [] } = opts;
 
-  await tableRefsFileGenerator(knexupDirPath, table);
+  file_.ensureDirPath(projectRoot);
+
+  await TableInitSetupGenerator({
+    tables,
+    projectRoot
+  });
 }

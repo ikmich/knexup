@@ -25,7 +25,7 @@ ${tokens.export_const__t_eq_tableRefs}`;
 }
 
 export async function extractTableRefsObject() {
-  const dir = await knexupUtil.getKnexupDirStub();
+  const dir = await knexupUtil.getSchemaDirSegment();
   const tableRefsFile = Path.join(dir, TABLE_REFS_FILENAME);
 
   let contents = file_.readFile(tableRefsFile) || '';
